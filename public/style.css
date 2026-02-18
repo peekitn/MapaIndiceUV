@@ -14,10 +14,6 @@ body {
   text-align: center;
 }
 
-h1 {
-  margin-bottom: 5px;
-}
-
 #map {
   height: 400px;
   border-radius: 15px;
@@ -29,4 +25,12 @@ h1 {
   padding: 15px;
   border-radius: 15px;
   font-size: 18px;
+  transition: 0.3s;
 }
+
+.uv-none { background: #e2e3e5; color: #333; }
+.uv-low { background: #d4edda; color: #155724; }
+.uv-moderate { background: #fff3cd; color: #856404; }
+.uv-high { background: #f8d7da; color: #721c24; }
+.uv-very-high { background: #f5c6cb; color: #721c24; }
+.uv-extreme { background: #721c24; color: white; }

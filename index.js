@@ -4,8 +4,6 @@ const axios = require("axios");
 const app = express();
 const PORT = 3000;
 
-console.log("Servidor iniciou");
-
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(express.json());
@@ -27,7 +25,6 @@ app.post("/uv", async (req, res) => {
 
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=uv_index&timezone=auto`;
-
     const response = await axios.get(url, { timeout: 5000 });
 
     const uv = response?.data?.current?.uv_index;
@@ -42,7 +39,10 @@ app.post("/uv", async (req, res) => {
 
     let level, advice;
 
-    if (uv < 3) {
+    if (uv < 1) {
+      level = "Sem radiação";
+      advice = "É noite ou o sol está muito fraco.";
+    } else if (uv < 3) {
       level = "Baixo";
       advice = "Seguro para atividades ao ar livre.";
     } else if (uv < 6) {
@@ -62,7 +62,7 @@ app.post("/uv", async (req, res) => {
     res.json({ uv: uv.toFixed(1), level, advice });
 
   } catch (err) {
-    console.error("Erro:", err.message);
+    console.error("Erro real:", err.message);
     res.json({
       uv: "Erro",
       level: "Erro",

@@ -12,7 +12,7 @@
   <div class="container">
     <h1>🌞 Índice UV Interativo</h1>
     <p>Clica no mapa para veres o índice UV em qualquer lugar</p>
-    
+
     <div id="map"></div>
 
     <div class="result">
@@ -25,45 +25,48 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<script>
-  const map = L.map("map").setView([38.7223, -9.1393], 5);
+  <script>
+    const map = L.map("map").setView([38.7223, -9.1393], 5);
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap"
-  }).addTo(map);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
+    }).addTo(map);
 
-  let marker;
+    let marker;
 
-  map.on("click", async (e) => {
-    const { lat, lng } = e.latlng;
+    map.on("click", async (e) => {
+      const { lat, lng } = e.latlng;
 
-    if (marker) map.removeLayer(marker);
-    marker = L.marker([lat, lng]).addTo(map);
+      if (marker) map.removeLayer(marker);
+      marker = L.marker([lat, lng]).addTo(map);
 
-    const response = await fetch("/uv", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lat, lon: lng })
+      document.getElementById("uv").innerText = "⏳ A carregar...";
+      document.getElementById("level").innerText = "";
+      document.getElementById("advice").innerText = "";
+
+      const response = await fetch("/uv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lon: lng })
+      });
+
+      const data = await response.json();
+
+      document.getElementById("uv").innerText = `☀️ UV: ${data.uv}`;
+      document.getElementById("level").innerText = `Nível: ${data.level}`;
+      document.getElementById("advice").innerText = data.advice;
+
+      const box = document.querySelector(".result");
+      box.className = "result";
+
+      if (data.level === "Sem radiação") box.classList.add("uv-none");
+      else if (data.level === "Baixo") box.classList.add("uv-low");
+      else if (data.level === "Moderado") box.classList.add("uv-moderate");
+      else if (data.level === "Alto") box.classList.add("uv-high");
+      else if (data.level === "Muito alto") box.classList.add("uv-very-high");
+      else if (data.level === "Extremo") box.classList.add("uv-extreme");
     });
-
-    const data = await response.json();
-
-    document.getElementById("uv").innerText = `☀️ UV: ${data.uv}`;
-    document.getElementById("level").innerText = `Nível: ${data.level}`;
-    document.getElementById("advice").innerText = data.advice;
-
-    // 🎨 cores dinâmicas
-    const box = document.querySelector(".result");
-    box.className = "result"; // reset
-
-    if (data.level === "Baixo") box.classList.add("uv-low");
-    else if (data.level === "Moderado") box.classList.add("uv-moderate");
-    else if (data.level === "Alto") box.classList.add("uv-high");
-    else if (data.level === "Muito alto") box.classList.add("uv-very-high");
-    else if (data.level === "Extremo") box.classList.add("uv-extreme");
-  });
-</script>
-
+  </script>
 
 </body>
 </html>
